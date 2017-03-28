@@ -203,4 +203,26 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("map transforms a given set into a cubic one") {
+    new TestSets {
+      val s = union(s2, s3)
+      val m = map(s, x => x * x * x + 1)
+      assert(contains(s, 2), "s contains 2")
+      assert(contains(s, 3), "s contains 3")
+      assert(contains(m, 9), "m contains 9")
+      assert(contains(m, 28), "m contains 28")
+    }
+  }
+
+  test("map transforms a given set into a constant one") {
+    new TestSets {
+      val s = union(s2, s3)
+      val m = map(s, x => 15)
+      assert(contains(s, 2), "s contains 2")
+      assert(contains(s, 3), "s contains 3")
+      assert(contains(m, 15), "m contains 15")
+      assert(!contains(m, 2), "m doesn't contain 2")
+    }
+  }
+
 }
