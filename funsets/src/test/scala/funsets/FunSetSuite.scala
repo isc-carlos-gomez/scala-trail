@@ -149,6 +149,16 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("filter of {1,3,4,5,7,1000} for _ < 5") {
+    new TestSets {
+      val s = (x: Int) => x >= 1 && x <= 5 || x == 7 || x == 1000
+      val r = filter(s, x => x < 5)
+      assert(contains(r, 1), "r contains 1")
+      assert(!contains(r, 5), "r doesn't contain 5")
+      assert(!contains(r, -1), "r doesn't contain -1")
+    }
+  }
+
   test("forall predicate is true for all elements of the set") {
     new TestSets {
       val s = union(union(s1, s2), s3)
