@@ -29,10 +29,10 @@ class FunSetSuite extends FunSuite {
   /**
    * Tests are written using the "test" operator and the "assert" method.
    */
-  // test("string take") {
-  //   val message = "hello, world"
-  //   assert(message.take(5) == "hello")
-  // }
+   test("string take") {
+     val message = "hello, world"
+     assert(message.take(5) == "hello")
+   }
 
   /**
    * For ScalaTest tests, there exists a special equality operator "===" that
@@ -43,9 +43,9 @@ class FunSetSuite extends FunSuite {
    * Try it out! Change the values so that the assertion fails, and look at the
    * error message.
    */
-  // test("adding ints") {
-  //   assert(1 + 2 === 3)
-  // }
+   test("adding ints") {
+     assert(1 + 2 === 3)
+   }
 
 
   import FunSets._
@@ -110,5 +110,97 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("intersect doesn't contain elements of any set") {
+    new TestSets {
+      val s = intersect(s1, s2)
+      assert(!contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+      assert(!contains(s, 3), "Intersect 3")
+    }
+  }
+
+  test("intersect contains elements that are in both sets") {
+    new TestSets {
+      val s = intersect(s1, union(s1, s2))
+      assert(contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+      assert(!contains(s, 3), "Intersect 3")
+    }
+  }
+
+  test("diff(s, t) contains all the elements of the set s that are not in the set t") {
+    new TestSets {
+      val s = union(s1, s2)
+      val t = union(s2, s3)
+      val r = diff(s, t)
+      assert(contains(r, 1), "Diff 1")
+      assert(!contains(r, 2), "Diff 2")
+      assert(!contains(r, 3), "Diff 3")
+    }
+  }
+
+  test("filter selects only the elements of a set that are accepted by a given predicate") {
+    new TestSets {
+      val s = union(union(s1, s2), s3)
+      val r = filter(s, x => x <= 2)
+      assert(contains(r, 1), "Diff 1")
+      assert(contains(r, 2), "Diff 2")
+      assert(!contains(r, 3), "Diff 3")
+    }
+  }
+
+  test("forall predicate is true for all elements of the set") {
+    new TestSets {
+      val s = union(union(s1, s2), s3)
+      assert(forall(s, x => x <= 3))
+    }
+  }
+
+  test("forall predicate is false for one element") {
+    new TestSets {
+      val s = union(union(s1, s2), s3)
+      assert(!forall(s, x => x <= 2))
+    }
+  }
+
+  test("exists on a set that contains valid elements") {
+    new TestSets {
+      val s = union(union(s1, s2), s3)
+      assert(exists(s, x => x <= 2))
+    }
+  }
+
+  test("exists on a set that doesn't contain valid elements") {
+    new TestSets {
+      val s = union(union(s1, s2), s3)
+      assert(!exists(s, x => x == 4))
+    }
+  }
+
+  test("map transforms a given set into another one") {
+    new TestSets {
+      val s = union(s1, s2)
+      val m = map(s, x => x + 1)
+      assert(contains(s, 1), "s contains 1")
+      assert(contains(s, 2), "s contains 2")
+      assert(!contains(s, 3), "s doesn't contain 3")
+      assert(!contains(s, 4), "s doesn't contain 4")
+      assert(!contains(m, 1), "m doesn't contain 1")
+      assert(contains(m, 2), "m contains 2")
+      assert(contains(m, 3), "m contains 3")
+      assert(!contains(m, 4), "m doesn't contain 4")
+    }
+  }
+
+  test("map transforms a given set into a quadratic one") {
+    new TestSets {
+      val s = union(s1, s2)
+      val m = map(s, x => x * x)
+      assert(contains(s, 1), "s contains 1")
+      assert(contains(s, 2), "s contains 2")
+      assert(contains(m, 1), "m contains 1")
+      assert(contains(m, 4), "m contains 4")
+    }
+  }
 
 }
