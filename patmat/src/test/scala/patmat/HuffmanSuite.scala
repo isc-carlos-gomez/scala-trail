@@ -11,7 +11,7 @@ import patmat.Huffman._
 class HuffmanSuite extends FunSuite {
   trait TestTrees {
     val t1 = Fork(Leaf('a', 2), Leaf('b', 3), List('a', 'b'), 5)
-    val t2 = Fork(Fork(Leaf('a', 2), Leaf('b', 3), List('a', 'b'), 5), Leaf('d', 4), List('a', 'b', 'd'), 9)
+    val t2 = Fork(t1, Leaf('d', 4), List('a', 'b', 'd'), 9)
   }
 
   test("weight of a larger tree") {
@@ -62,6 +62,10 @@ class HuffmanSuite extends FunSuite {
     assert(!singleton(List()))
   }
 
+  test("decode secret") {
+    assert(decodedSecret === "huffmanestcool".toList)
+  }
+
   test("combine of some leaf list") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
     assert(combine(leaflist) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4)))
@@ -71,6 +75,42 @@ class HuffmanSuite extends FunSuite {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
+  }
+
+  test("encode and decode a long text should be identity") {
+    val text = "Hola mundo! como estas? a donde vas? por que?".toList
+    val tree = createCodeTree(text)
+    assert(decode(tree, encode(tree)(text)) === text)
+  }
+
+  test("merge simple code tables") {
+    val table1 = List(('C', Nil))
+    val table2 = List(('D', Nil))
+    assert(mergeCodeTables(table1, table2) === List(('C', List(0)), ('D', List(1))))
+  }
+
+  test("merge complex code tables") {
+    val table1 = List(('B', Nil))
+    val table2 = List(('C', List(0)), ('D', List(1)))
+    assert(mergeCodeTables(table1, table2) === List(('B', List(0)), ('C', List(1, 0)), ('D', List(1, 1))))
+  }
+  
+  test("convert simple tree") {
+    new TestTrees {
+      assert(convert(t1) === List(('a',List(0)), ('b',List(1))))
+    }
+  }
+  
+  test("convert complex tree") {
+    new TestTrees {
+      assert(convert(t2) === List(('a',List(0, 0)), ('b',List(0, 1)), ('d',List(1))))
+    }
+  }
+  
+  test("quick encode and encode produce same result") {
+    val text = "Hola mundo! como estas? a donde vas? por que?".toList
+    val tree = createCodeTree(text)
+    assert(quickEncode(tree)(text) === encode(tree)(text))
   }
 
 }
