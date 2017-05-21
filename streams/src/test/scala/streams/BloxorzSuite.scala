@@ -100,5 +100,13 @@ class BloxorzSuite extends FunSuite {
       assert(solution.length == optsolution.length)
     }
   }
+	
+	
+	test("solution length when no solution is possible") {
+	  new Level1 {
+	    override lazy val goal: Pos = Pos(5, 0)
+	    assert(solution.length === 0)
+	  }
+	}
 
 }

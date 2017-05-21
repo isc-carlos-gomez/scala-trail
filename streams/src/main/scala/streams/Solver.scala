@@ -78,11 +78,6 @@ trait Solver extends GameDef {
       initial
     else
       initial ++ paths ++ from(paths, explored ++ paths.map{case (block, _) => block})
-//    case Stream.Empty => Stream.Empty
-//    case head #:: tail =>
-//      val paths = newNeighborsOnly(neighborsWithHistory(head._1, head._2), explored)
-//      initial ++ paths ++ from(tail, explored ++ paths.map{case (block, _) => block})
-//    from(initial, explored)
   }
 
   /**
@@ -108,5 +103,5 @@ trait Solver extends GameDef {
    * the first move that the player should perform from the starting
    * position.
    */
-  lazy val solution: List[Move] = pathsToGoal.head._2.reverse
+  lazy val solution: List[Move] = pathsToGoal.headOption.map(_._2.reverse).getOrElse(Nil)
 }
