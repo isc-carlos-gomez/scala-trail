@@ -17,6 +17,11 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     } yield insert(x, h))
   implicit lazy val arbHeap: Arbitrary[H] = Arbitrary(genHeap)
 
+  property("min1") = forAll { a: A =>
+    val h = insert(a, empty)
+    findMin(h) == a
+  }
+
   property("gen1") = forAll { (h: H) =>
     val m = if (isEmpty(h)) 0 else findMin(h)
     findMin(insert(m, h)) == m
@@ -27,10 +32,10 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     findMin(insert(x, insert(y, empty))) == m
   }
 
-  property("deleteMin(singleton heap) 	= empty heap") = forAll { (x: Int) =>
+  property("deleteMin(singletonHeap) 	= emptyHeap") = forAll { (x: Int) =>
     isEmpty(deleteMin(insert(x, empty)))
   }
-
+  
   property("findMin + deleteMin = ordered list") = {
     def findAndDeleteAll(h: H, acc: List[A]): List[A] =
       if (isEmpty(h)) acc
@@ -44,7 +49,7 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     }
   }
 
-  property("findMin on meld h1 and h2 = findMin on h1 or findMin on h2") =
+  property("findMin(meld(h1, h2)) = findMin(h1) or findMin(h2)") =
     forAll { (h1: H, h2: H) =>
       (!isEmpty(h1) && !isEmpty(h2)) ==> {
         val m = findMin(meld(h1, h2))
@@ -56,26 +61,26 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     meld(h, empty) == h
   }
 
-  property("insert in one heap and then meld == meld and then insert") =
+  property("meld(insert(x, h1), h2) = insert(x, meld(h1, h2))") =
     forAll { (h1: H, h2: H, x: Int) =>
       findMin(meld(insert(x, h1), h2)) == findMin(insert(x, meld(h1, h2)))
     }
 
-  property("x") = {
+  property("find & delete on heap(list) =  ordered list") = {
     def fromList(l: List[A], h: H): H = l match {
       case Nil     => h
       case x :: xs => fromList(xs, insert(x, h))
     }
-    def findAndDeleteAll(h: H, acc: List[A]): List[A] =
+    def findAndDelete(h: H, acc: List[A]): List[A] =
       if (isEmpty(h)) acc
       else {
         val m = findMin(h)
-        findAndDeleteAll(deleteMin(h), acc :+ m)
+        findAndDelete(deleteMin(h), acc :+ m)
       }
     forAll {
       (l: List[A]) =>
         val h = fromList(l, empty)
-        l.sorted == findAndDeleteAll(h, Nil)
+        l.sorted == findAndDelete(h, Nil)
     }
   }
 
